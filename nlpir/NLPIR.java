@@ -6,11 +6,29 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 
 public class NLPIR {
+	static String NLPIR_PATH;
+	static{
+		String os_name = System.getProperty("os.name");
+		String os_arch = System.getProperty("os.arch");
+		if(os_name.indexOf("indows")>-1){
+			if(os_arch.indexOf("64")>-1){
+				NLPIR_PATH = "lib/nlpir/win64/NLPIR";
+			}else{
+				NLPIR_PATH = "lib/nlpir/win32/NLPIR";
+			}
+		}else{
+			if(os_arch.indexOf("64")>-1){
+				NLPIR_PATH = "lib/nlpir/linux64/NLPIR";
+			}else{
+				NLPIR_PATH = "lib/nlpir/linux32/NLPIR";
+			}
+		}
+	}
 	// 定义接口CLibrary，继承自com.sun.jna.Library
 	public interface CLibrary extends Library {
 		// 定义并初始化接口的静态变量
 		CLibrary Instance = (CLibrary) Native.loadLibrary(
-				"lib/NLPIR", CLibrary.class);
+				NLPIR_PATH, CLibrary.class);
 		public int NLPIR_Init(String sDataPath, int encoding,
 				String sLicenceCode);
 		public String NLPIR_ParagraphProcess(String sSrc, int bPOSTagged);

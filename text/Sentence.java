@@ -7,9 +7,9 @@ import edu.stanford.nlp.trees.TypedDependency;
 
 public class Sentence {
 	//1.nlpir
-	List<String> words;
-	List<String> pos;
-	String segmented_str;
+	public List<String> words;
+	public List<String> pos;
+	public String segmented_str;
 	//2.tagger
 	List<String> pos2;	//using stanford pos tagger
 	//3.ner
@@ -39,6 +39,9 @@ public class Sentence {
 	}
 	public Sentence(String s){
 		self_init(s,null);
+	}
+	public String toString(){
+		return segmented_str;
 	}
 	
 	//negation --- for sentiment

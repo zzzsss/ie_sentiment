@@ -15,9 +15,10 @@ public class NaiveBayes extends Mach{
 		try{
 			FileInputStream in = new FileInputStream(filename);
 			Scanner sin = new Scanner(in);
-			if(sin.next() != NAMES[mach_id]){
+			String name_of_mach="";
+			if(!(name_of_mach=sin.next()).equals(NAMES[mach_id])){
 				sin.close();
-				throw new RuntimeException("Wrong mach file, should be naiveb.");
+				throw new RuntimeException("Wrong mach file, should be svm, but "+name_of_mach);
 			}
 			classes = sin.nextInt();
 			v_size = sin.nextInt();
@@ -35,45 +36,57 @@ public class NaiveBayes extends Mach{
             throw new RuntimeException("File not exist: "+filename);
 		}
 	}
-	
-	public NaiveBayes(int c,int v,List<int[]>[] index){
+	public NaiveBayes(){
 		super(0);
+	}
+	
+	public void train(List<DataPoint> index,Object others){
+		//not support
+		throw new RuntimeException("No support for this mode.");
+	}
+	
+	public void train(int v,List<DataPoint>[] index,Object others){
 		//index should be of size c
-		classes = c;
+		classes = index.length;
 		v_size = v;
 		log_pcw = new double[classes][v_size];
 		log_pc = new double[classes];
 		int pc_normalize = 0;
-		for(int i=0;i<c;i++){
-			List<int[]> t = index[i];
+		for(int i=0;i<classes;i++){
+			List<DataPoint> t = index[i];
 			log_pc[i] = t.size();	//temperary for counts
 			pc_normalize += log_pc[i];
 			//count for log_pcw[i]
 			int pcw_count = v_size;
 			for(int j=0;j<v_size;j++)
 				log_pcw[i][j] = 1;	//smoothing
-			for(int[] item : t){
-				//HashSet<Integer> no_rep = new HashSet<Integer>(item);	//not here
-				pcw_count += item.length;
-				for(int ind : item)
-					log_pcw[i][ind] ++;
+			for(DataPoint item : t){
+				int [] ind = item.get_index();
+				double [] fv = item.get_fvalue();
+				for(int one=0;one<ind.length;one++){
+					int num = (int)(fv[one]);
+					pcw_count += num;
+					log_pcw[i][ind[one]] += num;
+				}
 			}
 			//normalize and log
 			for(int n=0;n<v_size;n++)
 				log_pcw[i][n] = Math.log(log_pcw[i][n]/pcw_count);
 		}
-		for(int i=0;i<c;i++){
+		for(int i=0;i<classes;i++){
 			log_pc[i] = Math.log(log_pc[i]/pc_normalize);
 		}
 	}
 	
-	public double evaluate(int[]index,double[]f){
+	public double evaluate(DataPoint x){
 		//no check here --- here f can be null
 		double []values = new double[classes];
+		int [] ind = x.get_index();
+		double [] fv = x.get_fvalue();
 		for(int i=0;i<classes;i++){
 			values[i] = log_pc[i];
-			for(int ind : index)
-				values[i] += log_pcw[i][ind];
+			for(int tmp = 0; tmp < ind.length ; tmp++)
+				values[i] += fv[tmp]*log_pcw[i][ind[tmp]];
 		}
 		int max_item = 0;
 		double max_value = values[0];
@@ -86,10 +99,10 @@ public class NaiveBayes extends Mach{
 		return max_item;
 	}
 	
-	public List<Double> evaluate(List<int[]> i,List<double[]> f){
+	public List<Double> evaluate(List<DataPoint> x){
 		List<Double> ret = new ArrayList<Double>();
-		for(int[] index : i){
-			ret.add(evaluate(index,null));
+		for(DataPoint index : x){
+			ret.add(evaluate(index));
 		}
 		return ret;
 	}
