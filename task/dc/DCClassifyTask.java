@@ -9,6 +9,7 @@ public class DCClassifyTask {
 	static String FNAME_MACH = ".mach";
 	static String FNAME_FOLD = ".fold";
 	static int FOLDS = 3;
+	static double TTRATIO = 0.9;
 	
 	DCCorpusReader reader;
 	DCFeatureGenerator feature_gen;
@@ -46,6 +47,39 @@ public class DCClassifyTask {
 		}
 		return ((double)right)/all;
 	}
+	
+	//evaluate precision, recall, f1
+	private double[][] self_test_evaluation_all(List<Double>[] result,boolean info_output){
+		//for each class
+		double[] prec = new double[result.length];
+		double[] rec = new double[result.length];
+		double[] f1 = new double[result.length];
+		int[] choose = new int[result.length];	//result as positive
+		int[] tp = new int[result.length];		//true positive
+		for(int i=0;i<result.length;i++){
+			for(double d : result[i]){
+				int predict = (int)(d+0.5);	//round up --- maybe ok for regression
+				if(predict == i)
+					tp[i] ++;
+				choose[predict] ++;
+			}
+		}
+		for(int i=0;i<result.length;i++){
+			prec[i] = ((double)(tp[i])) / choose[i];
+			rec[i] = ((double)(tp[i])) / result[i].size();
+			f1[i] = (2*prec[i]*rec[i])/(prec[i]+rec[i]);
+		}
+		double [][]ret = new double[][]{prec,rec,f1};
+		
+		if(info_output){
+			System.out.println("The result is:");
+			for(int i=0;i<result.length;i++){
+				System.out.printf("--For class %d: precision %f, recall %f, f1 %f\n.",i,ret[0][i],ret[1][i],ret[2][i]);
+			}
+		}
+		return ret;
+	}
+	
 	
 	//-----------------------
 	public DCClassifyTask(DCCorpusReader r,DCFeatureGenerator f,Mach t,Dict x){
@@ -97,17 +131,20 @@ public class DCClassifyTask {
 			}
 			//train
 			self_train_onepiece(train_d,(name+FNAME_FOLD+i),false);
-			double acc = self_test_accuracy(held_d,self_test_onepiece(held_d));
+			List<Double>[] cur_result = self_test_onepiece(held_d);
+			double acc = self_test_accuracy(held_d,cur_result);
 			System.out.println("--Accuracy for fold "+i+" is "+acc);
+			self_test_evaluation_all(cur_result,true);
 			all_acc += acc;
 		}
-		System.out.println("Final average accuracy is "+all_acc/FOLDS);
+		System.out.println("-Final average accuracy is "+all_acc/FOLDS);
 	}
 	public void test_all(String data_loc,String name){
 		System.out.println("Testing all data of "+data_loc);
 		List<Paragraph>[] input_data = reader.read_corpus(data_loc);
-		double acc = self_test_accuracy(input_data,self_test_onepiece(input_data));
-		System.out.println("The accuracy is "+acc);
+		//double acc = self_test_accuracy(input_data,self_test_onepiece(input_data));
+		//System.out.println("The accuracy is "+acc);
+		self_test_evaluation_all(self_test_onepiece(input_data),true);
 	}
 	//special one
 	public double test_one(String str){
@@ -117,5 +154,22 @@ public class DCClassifyTask {
 		List<Double>[] ret = self_test_onepiece(new List[]{pl});
 		double result = ret[0].get(0);
 		return result;
+	}
+	
+	//---------train and test--------------
+	public void train_part(String data_loc,String name){
+		System.out.println("Training "+TTRATIO+" of the data of "+data_loc+", and test the rest.");
+		List<Paragraph>[] input_data = reader.read_corpus(data_loc);
+		List<Paragraph>[][] split_data = new List[2][input_data.length];
+		for(int i=0;i<input_data.length;i++){
+			int sep_point = (int)(input_data[i].size()*TTRATIO);
+			split_data[0][i] = new ArrayList<Paragraph>(input_data[i].subList(0,sep_point));
+			split_data[1][i] = new ArrayList<Paragraph>(input_data[i].subList(sep_point,input_data[i].size()));
+		}
+		//train the training one
+		self_train_onepiece(split_data[0],name,true);
+		//test one
+		List<Double>[] result = self_test_onepiece(split_data[1]);
+		self_test_evaluation_all(result,true);
 	}
 }

@@ -24,6 +24,7 @@ public class Tools {
 	//paths
 	//1.nlpir
 	static String nlpir_path = "lib";
+	static String NO_POS = "nope";
 	//1.5 tag
 	static String pos_path = "models/chinese-distsim.tagger";
 	static MaxentTagger tagger;
@@ -118,7 +119,10 @@ public class Tools {
 		for(String word : split){
 			String[] one = word.split("/");
 			results.add(one[0]);
-			resultp.add(one[1]);
+			if(one.length > 1)	//what ??
+				resultp.add(one[1]);
+			else
+				resultp.add(NO_POS);
 			result.append(one[0]+" ");
 		}
 		if(result.length() > 0){

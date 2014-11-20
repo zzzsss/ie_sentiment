@@ -1,7 +1,6 @@
 package task.dc.sentiment;
 
 import java.io.*;
-import java.util.*;
 
 import task.dc.*;
 import text.*;
@@ -34,20 +33,17 @@ public class Sentiment {
 	}
 
 	public static void main(String[] x) throws Exception{
-		/*
-		init_task(0);
-		task.train_cv("data/t1", "testing/t1n");
-		task.train_all("data/t1", "testing/t1n");
-		*/
-		/*
+		
+		
 		init_task(1);
-		task.train_cv("data/t1", "testing/t1c");
-		task.train_all("data/t1", "testing/t1c");
-		*/
+		//task.train_cv("data/t", "testing/f1_n");
+		task.train_part("data/t", "testing/f1_s");
 		
 		
-		init_task("testing/t1n.mach","testing/t1n.fdict");
-		//init_task("testing/t1c.mach","testing/t1c.fdict");
+		
+		
+		/*
+		init_task("testing/final_n.mach","testing/final_n.fdict");
 		BufferedInputStream i = new BufferedInputStream(System.in);
         BufferedReader br = new BufferedReader(new InputStreamReader(i));
         do{
@@ -58,9 +54,6 @@ public class Sentiment {
         	double ret = task.test_one(line);
         	System.out.println("Result is "+ret);
         }while(true);
-        
-		
-		
-		
+        */
 	}
 }
