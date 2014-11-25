@@ -182,7 +182,7 @@ public class Tools {
 	//testing
 	public static void main(String[] x){
 		init(false,false);
-		String sample = "这部电影不会是这样。";
+		String sample = "实在不值得一看。";
 		Object[] sseg = get_seg(sample,null);
 		System.out.println((List<String>)sseg[0]);
 		System.out.println((List<String>)sseg[1]);

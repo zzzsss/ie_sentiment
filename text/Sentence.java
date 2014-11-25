@@ -11,7 +11,7 @@ public class Sentence {
 	public List<String> pos;
 	public String segmented_str;
 	//2.tagger
-	List<String> pos2;	//using stanford pos tagger
+	public List<String> pos2;	//using stanford pos tagger
 	//3.ner
 	List<String> ner;
 	//4.parser
@@ -41,11 +41,11 @@ public class Sentence {
 		self_init(s,null);
 	}
 	public String toString(){
-		return segmented_str;
+		return words.toString();
 	}
 	
 	//negation --- for sentiment
-	static String[] NEG_INDICATE_ARRAY = new String[]{"不","没有","不是"};
+	static String[] NEG_INDICATE_ARRAY = new String[]{"不","没有","不是","没","不如"};
 	static HashSet<String> NEG_INDICATE = new HashSet<String>();
 	static String[] STOP_INDICATE_ARRAY = new String[]{"!","?",",",".","？","！","，","。"};
 	static HashSet<String> STOP_INDICATE = new HashSet<String>();

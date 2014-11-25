@@ -14,7 +14,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class LibsvmCommon extends Mach{
-	public static int MODE_CLASS=0,MODE_REG=1;
+	public static int MODE_CLASS=0,MODE_REG=1,MODE_LINEAR=2;
 	static Random RAND_N = new Random();
 	static int DEF_NAME_LEN = 10;
 	//filenames
@@ -26,12 +26,15 @@ public class LibsvmCommon extends Mach{
 	static String FNAME_CVOUT = ".cvout";
 	static String FNAME_OUT = ".output";
 	//libsvm (on windows)
-	static String LIBSVM_SCALE = "svm/windows/svm-scale.exe";
-	static String LIBSVM_TRAIN = "svm/windows/svm-train.exe";
-	static String LIBSVM_TEST = "svm/windows/svm-predict.exe";
+	static String LIBSVM_SCALE = "svm/libsvm/svm-scale.exe";
+	static String LIBSVM_TRAIN = "svm/libsvm/svm-train.exe";
+	static String LIBSVM_TEST = "svm/libsvm/svm-predict.exe";
 	static String LIBSVM_GRID = "svm/test/grid.py";
 	static int LIBSVM_CV_FOLD = 5;
 	static String LIBSVM_OPTION_REG = " -s 3 ";
+	//liblinear (for windows)
+	static String LIBLINEAR_TRAIN = "svm/liblinear/train.exe";
+	static String LIBLINEAR_TEST = "svm/liblinear/predict.exe";
 	
 	int mode;
 	String svm_name;	//for the files of libsvm
@@ -113,8 +116,15 @@ public class LibsvmCommon extends Mach{
 	private String cross_v(String name,String cvout,String pass_options){
 		try {
             Runtime run = Runtime.getRuntime();
-            String cmd = ("python "+LIBSVM_GRID+" -gnuplot null -v "+LIBSVM_CV_FOLD
-            		+" -svmtrain "+LIBSVM_TRAIN+" "+pass_options+" -out "+cvout+" "+name);
+            String cmd = "";
+            if(mode != MODE_LINEAR){
+            	cmd = ("python "+LIBSVM_GRID+" -gnuplot null -v "+LIBSVM_CV_FOLD
+            			+" -svmtrain "+LIBSVM_TRAIN+" "+pass_options+" -out "+cvout+" "+name);
+            }
+            else{	//for liblinear
+            	cmd = ("python "+LIBSVM_GRID+" -gnuplot null -v "+LIBSVM_CV_FOLD + " -log2c -14,14,1 -log2g 1,1,1 "
+            			+" -svmtrain "+LIBLINEAR_TRAIN+" -out "+cvout+" "+name);
+            }
             outputln_stdout("Executing: "+cmd);
             Process p = run.exec(cmd);
             BufferedInputStream in_out = new BufferedInputStream(p.getInputStream());
@@ -134,7 +144,10 @@ public class LibsvmCommon extends Mach{
             	outputln_stderr(lineStr);
             String [] result = lineStr2.split(" ");
             System.out.println("CV for "+svm_name+" "+lineStr2);
-            return " -c "+result[0]+" -g "+result[1]+" ";
+            if(mode != MODE_LINEAR)
+            	return " -c "+result[0]+" -g "+result[1]+" ";
+            else
+            	return " -c "+result[0]+" ";
 		}catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -143,7 +156,11 @@ public class LibsvmCommon extends Mach{
 	private void libsvm_train(String fname,String mname,String pass){
 		try {
             Runtime run = Runtime.getRuntime();
-            String cmd = (LIBSVM_TRAIN+" "+pass+" "+fname+" "+mname);
+            String cmd = "";
+            if(mode != MODE_LINEAR)
+            	cmd = (LIBSVM_TRAIN+" "+pass+" "+fname+" "+mname);
+            else
+            	cmd = (LIBLINEAR_TRAIN+" "+pass+" "+fname+" "+mname);
             outputln_stdout("Executing: "+cmd);
             Process p = run.exec(cmd);
             BufferedInputStream in_out = new BufferedInputStream(p.getInputStream());
@@ -165,7 +182,11 @@ public class LibsvmCommon extends Mach{
 	private void libsvm_test(String fname,String mname,String output){
 		try {
             Runtime run = Runtime.getRuntime();
-            String cmd = (LIBSVM_TEST+" "+fname+" "+mname+" "+output);
+            String cmd = "";
+            if(mode != MODE_LINEAR)
+            	cmd = (LIBSVM_TEST+" "+fname+" "+mname+" "+output);
+            else
+            	cmd = (LIBLINEAR_TEST+" "+fname+" "+mname+" "+output);
             outputln_stdout("Executing: "+cmd);
             Process p = run.exec(cmd);
             BufferedInputStream in_out = new BufferedInputStream(p.getInputStream());
@@ -209,6 +230,10 @@ public class LibsvmCommon extends Mach{
 		super(1);
 		mode = m;
 	}
+	public LibsvmCommon(){	//default liblinear
+		super(1);
+		mode = MODE_LINEAR;
+	}
 	
 	//--------
 	public void train(List<DataPoint> index,Object others){
@@ -221,7 +246,7 @@ public class LibsvmCommon extends Mach{
 		String range_name = svm_name+FNAME_RANGE;
 		String model_name = svm_name+FNAME_MODEL;
 		String cvout_name = svm_name+FNAME_CVOUT;
-		String reg_option = (mode==MODE_CLASS)?" ":LIBSVM_OPTION_REG;
+		String reg_option = (mode != MODE_REG)?" ":LIBSVM_OPTION_REG;
 		write_data(training_data,train_name);
 		scale_data(train_name,scale_name,range_name,true);
 		String pass = cross_v(scale_name,cvout_name,reg_option);
@@ -299,9 +324,9 @@ public class LibsvmCommon extends Mach{
 				}
 				tr.add(new DataPoint(v,d_ind,d_fv));
 			}
-			test_svm = new LibsvmCommon(MODE_CLASS);
-			test_svm.train(tr, "testings\\abcdef");
-			test_svm.write("testing\\train");
+			test_svm = new LibsvmCommon(2);
+			test_svm.train(tr, "svm\\test\\abc");
+			test_svm.write("svm\\test\\abc.mach");
 			sin.close();
 			
 		}catch (FileNotFoundException e){

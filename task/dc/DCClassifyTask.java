@@ -144,7 +144,9 @@ public class DCClassifyTask {
 		List<Paragraph>[] input_data = reader.read_corpus(data_loc);
 		//double acc = self_test_accuracy(input_data,self_test_onepiece(input_data));
 		//System.out.println("The accuracy is "+acc);
-		self_test_evaluation_all(self_test_onepiece(input_data),true);
+		List<Double> [] res = self_test_onepiece(input_data);
+		self_test_evaluation_all(res,true);
+		System.out.println("The accuracy is "+self_test_accuracy(input_data,res));
 	}
 	//special one
 	public double test_one(String str){
@@ -171,5 +173,6 @@ public class DCClassifyTask {
 		//test one
 		List<Double>[] result = self_test_onepiece(split_data[1]);
 		self_test_evaluation_all(result,true);
+		System.out.println("The accuracy is "+self_test_accuracy(split_data[1],result));
 	}
 }

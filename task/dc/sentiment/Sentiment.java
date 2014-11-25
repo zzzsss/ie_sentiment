@@ -7,7 +7,7 @@ import text.*;
 import training.*;
 
 public class Sentiment {
-	static int NB=0,SVMC=1,SVMR=2;
+	static int NB=0,SVMC=1,SVMR=2,SVM_LI=3;
 	
 	static DCCorpusReader r = new SentimentReader1();
 	static DCFeatureGenerator f = new SentimentFeature1();
@@ -35,15 +35,12 @@ public class Sentiment {
 	public static void main(String[] x) throws Exception{
 		
 		
-		init_task(1);
+		init_task(3);
 		//task.train_cv("data/t", "testing/f1_n");
-		task.train_part("data/t", "testing/f1_s");
-		
-		
-		
+		task.train_part("data/t_correct", "testing2/f1_s");
 		
 		/*
-		init_task("testing/final_n.mach","testing/final_n.fdict");
+		init_task("testing2/f1_n.mach","testing2/f1_n.fdict");
 		BufferedInputStream i = new BufferedInputStream(System.in);
         BufferedReader br = new BufferedReader(new InputStreamReader(i));
         do{
