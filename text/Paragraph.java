@@ -3,7 +3,7 @@ package text;
 import java.util.*;
 import java.io.*;
 
-public class Paragraph {
+public class Paragraph implements Serializable{
 	//break the sentences in this simple way for chinese
 	static String[] END_INDICATE_ARRAY = new String[]{"!","?","£¿","£¡","¡£"};
 	static HashSet<String> END_INDICATE = new HashSet<String>();

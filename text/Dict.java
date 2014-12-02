@@ -6,7 +6,7 @@ import java.io.*;
 public class Dict {
 	boolean opened;
 	int index;
-	HashMap<String,Integer> maps;
+	public HashMap<String,Integer> maps;	//not good design...
 	
 	private void init(){
 		opened = true;

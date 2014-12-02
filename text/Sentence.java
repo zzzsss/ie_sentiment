@@ -5,7 +5,7 @@ import java.util.*;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 
-public class Sentence {
+public class Sentence implements java.io.Serializable{
 	//1.nlpir
 	public List<String> words;
 	public List<String> pos;
@@ -55,7 +55,7 @@ public class Sentence {
 		for(String x:STOP_INDICATE_ARRAY)
 			STOP_INDICATE.add(x);
 	}
-	static String NEG_HEAD = "NOT_";
+	public static String NEG_HEAD = "NOT_";
 	public void negation(){
 		//simple method
 		int neg = 0;

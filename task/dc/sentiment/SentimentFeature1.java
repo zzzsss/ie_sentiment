@@ -28,17 +28,4 @@ public class SentimentFeature1 extends DCFeatureGenerator{
 		Arrays.sort(feats_one);
 		return new DataPoint(c,feats_one);
 	}
-	
-	//test
-	public static void main(String[] x){
-		Tools.init(false,false);
-		DCCorpusReader r = new SentimentReader1();
-		DCFeatureGenerator f = new SentimentFeature1();
-		List<Paragraph>[] what = r.read_corpus("data/t");
-
-		Object[] whatwhat = f.get_datapoints(what, null);
-		List<DataPoint>[] a = (List<DataPoint>[])whatwhat[0];
-		Dict b = (Dict)whatwhat[1];
-		Tools.deinit();
-	}
 }

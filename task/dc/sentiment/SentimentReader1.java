@@ -12,9 +12,7 @@ public class SentimentReader1 extends DCCorpusReader{
 	
 	int mode;
 	//----
-	private void Error(String x){
-		throw new RuntimeException(x);
-	}
+	
 	private List<Paragraph>[] read_seperate_dirs(int classes,HashMap<String,File> fnames){
 		//for all those classes
 		List<Paragraph>[] ret = new List[classes];

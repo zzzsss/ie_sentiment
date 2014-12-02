@@ -7,25 +7,37 @@ import text.*;
 import training.*;
 
 public class SentimentFeature4 extends DCFeatureGenerator{
-	//Unigram + unigram-ADJ
+	//adding the although-but dealing...
 	protected DataPoint get_one(Paragraph p,Dict d,int c){
-		//1. first deal with negation
-		p.negation();
-		//2. bag of words 
-		// --- not good design of public sents and words, but ...
+		// unigram + bigram + although-but
 		Set<Integer> feats = new HashSet<Integer>();
 		for(Sentence s : p.sents){
-			for(int i=0;i<s.words.size();i++){
-				String str = s.words.get(i);
-				if(s.pos2.get(i).indexOf("JJ") > -1){
-					int ind = d.add(str+"-JJ");
-					if(ind >= 0)	//exist or not-closed
-						feats.add(ind);
+			s.negation();
+			
+			int size = s.words.size();
+			for(int i=0;i<size;i++){
+				String c_word = s.words.get(i);
+				//unigram
+				add_one_str_feature(c_word,d,feats);
+				//bigram
+				if(i < s.words.size()-1){
+					String str2 = c_word+"||"+s.words.get(i+1);
+					add_one_str_feature(str2,d,feats);
 				}
-				int ind = d.add(str);
-				if(ind >= 0)	//exist or not-closed
-					feats.add(ind);
 			}
+			
+			deal_but(s);
+			for(int i=0;i<size;i++){
+				String c_word = s.words.get(i);
+				//unigram
+				add_one_str_feature(c_word,d,feats);
+				//bigram
+				if(i < s.words.size()-1){
+					String str2 = c_word+"||"+s.words.get(i+1);
+					add_one_str_feature(str2,d,feats);
+				}
+			}
+			
 		}
 		int[] feats_one = new int[feats.size()];
 		int i=0;
