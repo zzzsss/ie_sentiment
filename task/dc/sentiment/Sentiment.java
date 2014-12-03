@@ -11,7 +11,9 @@ public class Sentiment {
 	static int NB=0,SVMC=1,SVMR=2,SVM_LI=3;
 	
 	static DCCorpusReader r = new SentimentReader2();
-	static DCFeatureGenerator f = new SimpleFeatureSelection(new SentimentFeature1(),5,800);
+	//static DCFeatureGenerator f = new SimpleFeatureSelection(new SentimentFeature1(),1,10000);
+	//static DCFeatureGenerator f = new SentimentFeature_try();
+	static DCFeatureGenerator f = new SentimentFeatureSpecial();
 	static Mach m;
 	static Dict d;
 	static DCClassifyTask task;
@@ -26,7 +28,7 @@ public class Sentiment {
 		if(mach == NB)
 			m = new NaiveBayes();
 		else
-			m = new LibsvmCommon(mach-1);
+			m = new LibsvmCommon(mach-1,false);
 		task = new DCClassifyTask(r,f,m);
 	}
 	static void init_task(String mach,String dict){
@@ -36,10 +38,8 @@ public class Sentiment {
 	}
 
 	public static void main(String[] x) throws Exception{
-		
-		
-		init_task(0);
-		//task.train_cv("data/t", "testing/f1_n");
+		init_task(3);
+		//task.train_cv("data/t_correct/data2_origin.obj", "testing2/nothing");
 		task.train_part("data/t_correct/data2_origin.obj", "testing2/nothing");
 		return;
 		/*

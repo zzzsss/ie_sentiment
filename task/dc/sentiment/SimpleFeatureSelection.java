@@ -24,7 +24,7 @@ public class SimpleFeatureSelection extends DCFeatureGenerator{
 	}
 	
 	//return Object{List<DataPoint>[],Dict} --- if d==null then generate one
-		public Object[] get_datapoints(List<Paragraph>[] pl,Dict d){
+        public Object[] get_datapoints(List<Paragraph>[] pl,Dict d){
 			if(d != null){	//not train-process
 				return base.get_datapoints(pl, d);
 			}

@@ -38,6 +38,7 @@ public class LibsvmCommon extends Mach{
 	
 	int mode;
 	String svm_name;	//for the files of libsvm
+	boolean need_scale = false;
 	
 	//-----------infomations---------------
 	private void outputln_stdout(String x){
@@ -219,6 +220,7 @@ public class LibsvmCommon extends Mach{
 			}
 			svm_name = sin.next();
 			mode = sin.nextInt();
+			need_scale = sin.nextBoolean();
 			sin.close();
 		}catch (FileNotFoundException e){
             e.printStackTrace();
@@ -226,9 +228,10 @@ public class LibsvmCommon extends Mach{
 		}
 	}
 	
-	public LibsvmCommon(int m){
+	public LibsvmCommon(int m,boolean scale){
 		super(1);
 		mode = m;
+		need_scale = scale;
 	}
 	public LibsvmCommon(){	//default liblinear
 		super(1);
@@ -242,13 +245,16 @@ public class LibsvmCommon extends Mach{
 		List<DataPoint> training_data = index;
 		//write training file
 		String train_name = svm_name+FNAME_TRAIN;
-		String scale_name = train_name+FNAME_SCALE;
+		String scale_name = train_name;
+		if(need_scale)
+			scale_name = scale_name +FNAME_SCALE;
 		String range_name = svm_name+FNAME_RANGE;
 		String model_name = svm_name+FNAME_MODEL;
 		String cvout_name = svm_name+FNAME_CVOUT;
 		String reg_option = (mode != MODE_REG)?" ":LIBSVM_OPTION_REG;
 		write_data(training_data,train_name);
-		scale_data(train_name,scale_name,range_name,true);
+		if(need_scale)
+			scale_data(train_name,scale_name,range_name,true);
 		String pass = cross_v(scale_name,cvout_name,reg_option);
 		libsvm_train(scale_name,model_name,pass+reg_option);
 	}
@@ -264,13 +270,16 @@ public class LibsvmCommon extends Mach{
 		List<Double> ret = new ArrayList<Double>();
 		//write test file
 		String test_name = svm_name+FNAME_TEST;
-		String scale_name = test_name+FNAME_SCALE;
+		String scale_name = test_name;
+		if(need_scale)
+			scale_name = scale_name +FNAME_SCALE;
 		String range_name = svm_name+FNAME_RANGE;
 		String model_name = svm_name+FNAME_MODEL;
 		String output_name = test_name+FNAME_OUT;
 
 		write_data(testing_data,test_name);
-		scale_data(test_name,scale_name,range_name,false);
+		if(need_scale)
+			scale_data(test_name,scale_name,range_name,false);
 		libsvm_test(scale_name,model_name,output_name);
 		try{
 			FileInputStream in = new FileInputStream(output_name);
@@ -292,6 +301,7 @@ public class LibsvmCommon extends Mach{
 			p.println(NAMES[mach_id]);
 			p.println(svm_name);
 			p.println(mode);
+			p.println(need_scale);
 			p.close();
 		}catch (FileNotFoundException e){
             e.printStackTrace();
@@ -324,7 +334,7 @@ public class LibsvmCommon extends Mach{
 				}
 				tr.add(new DataPoint(v,d_ind,d_fv));
 			}
-			test_svm = new LibsvmCommon(2);
+			test_svm = new LibsvmCommon(2,false);
 			test_svm.train(tr, "svm\\test\\abc");
 			test_svm.write("svm\\test\\abc.mach");
 			sin.close();

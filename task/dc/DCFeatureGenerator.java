@@ -63,8 +63,13 @@ public abstract class DCFeatureGenerator {
 				idi = 1;
 			else if(s.pos.get(i).length()>0 && s.pos.get(i).charAt(0) == 'w')	//punct
 				idi = -1;
-			else if(idi >= 0)
-				s.words.set(i,AB_HEAD[idi]+now);
+			else if(idi >= 0){
+				//if(s.pos.get(i).length()>0){ 
+				//	char x = s.pos.get(i).charAt(0);
+				//	if(x=='v' || x=='n' || x=='a')
+						s.words.set(i,AB_HEAD[idi]+now);
+				//}
+			}
 		}
 	}
 }
