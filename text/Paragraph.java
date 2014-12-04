@@ -56,10 +56,4 @@ public class Paragraph implements Serializable{
 			x += s;
 		return x;
 	}
-	
-	//for sentiment
-	public void negation(){
-		for(Sentence s : sents)
-			s.negation();
-	}
 }

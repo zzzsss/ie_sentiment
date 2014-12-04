@@ -6,13 +6,12 @@ import task.dc.*;
 import text.*;
 import training.*;
 
-public class SentimentFeature_try extends DCFeatureGenerator{
+public class SentimentFeature_try extends FeatureCounter{
 	//baseline feature --- bag of words
-	protected DataPoint get_one(Paragraph p,Dict d,int c){
-		
+	public HashMap<Integer,Integer> get_one(Paragraph p,Dict d){
 		//bag of words 
 		// --- not good design of public sents and words, but ...
-		Set<Integer> feats = new HashSet<Integer>();
+		HashMap<Integer,Integer> feats = new HashMap<Integer,Integer>();
 		for(Sentence s : p.sents){
 			/*
 			boolean contains = false;
@@ -28,7 +27,7 @@ public class SentimentFeature_try extends DCFeatureGenerator{
 			*/
 			
 			//first deal with negation
-			s.negation();
+			negation(s);
 			
 			int size = s.words.size();
 			for(int i=0;i<size;i++){
@@ -138,11 +137,6 @@ public class SentimentFeature_try extends DCFeatureGenerator{
 			}*/
 			
 		}
-		int[] feats_one = new int[feats.size()];
-		int i=0;
-		for(int x : feats)
-			feats_one[i++] = x;
-		Arrays.sort(feats_one);
-		return new DataPoint(c,feats_one);
+		return feats;
 	}
 }

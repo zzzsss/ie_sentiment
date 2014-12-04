@@ -2,6 +2,7 @@ package task.dc.sentiment;
 
 import java.util.*;
 import text.*;
+import task.dc.FeatureCounter;
 
 public class SentimentSimple {
 	static Random rand;
@@ -18,20 +19,21 @@ public class SentimentSimple {
 			for(Paragraph p : data[i]){
 				int good = 0,bad = 0;
 				for(Sentence s : p.sents){
-					s.negation();
+					//first deal with negation
+					FeatureCounter.negation(s);
 					for(String x : s.words){
 						String x_really = x;
-						if(x.startsWith(Sentence.NEG_HEAD)){
-							x_really = x_really.substring(Sentence.NEG_HEAD.length());
+						if(x.startsWith(FeatureCounter.NEG_HEAD)){
+							x_really = x_really.substring(FeatureCounter.NEG_HEAD.length());
 						}
 						if(d.search(x_really) == DictSentiment.BAD_SET){
-							if(x.startsWith(Sentence.NEG_HEAD))
+							if(x.startsWith(FeatureCounter.NEG_HEAD))
 								good++;
 							else
 								bad++;
 						}
 						else if(d.search(x_really) == DictSentiment.GOOD_SET){
-							if(x.startsWith(Sentence.NEG_HEAD))
+							if(x.startsWith(FeatureCounter.NEG_HEAD))
 								bad++;
 							else
 								good++;

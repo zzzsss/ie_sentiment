@@ -45,8 +45,8 @@ public class SentimentReader2  extends DCCorpusReader{
 		String f = "data/t_correct/data.obj";
 		
 		Tools.init(false,false);
-		//for(String xx : DictSentiment.dict_sentiment.get_bunch(DictSentiment.ALL_SET))
-		//	CLibrary.Instance.NLPIR_AddUserWord(xx);
+		for(String xx : DictSentiment.dict_sentiment.get_bunch(DictSentiment.ALL_SET))
+			CLibrary.Instance.NLPIR_AddUserWord(xx);
 		List<Paragraph>[] d = (new SentimentReader1()).read_corpus("data/t_correct");
 		
 		write_corpus(d,f);

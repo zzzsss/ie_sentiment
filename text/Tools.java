@@ -1,5 +1,6 @@
 package text;
 
+/* no need
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
@@ -15,8 +16,8 @@ import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.trees.TypedDependency;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseTreebankLanguagePack;
 import edu.stanford.nlp.ling.CoreAnnotations;
+*/
 import nlpir.NLPIR.CLibrary;
-
 import java.io.PrintStream;
 import java.util.*;
 
@@ -24,19 +25,19 @@ public class Tools {
 	//paths
 	//1.nlpir
 	static String nlpir_path = "lib";
-	static String NO_POS = "nope";
+	static String NO_POS = "0000";
 	//1.5 tag
 	static String pos_path = "models/chinese-distsim.tagger";
-	static MaxentTagger tagger;
+	//static MaxentTagger tagger;
 	//2.ner
 	static String ner_path = "models/chinese.misc.distsim.crf.ser.gz";
-	static AbstractSequenceClassifier<CoreLabel> ner_classifier;
+	//static AbstractSequenceClassifier<CoreLabel> ner_classifier;
 	//3.parser
 	static String parser_path = "models/chinesePCFG.ser.gz";
-	static LexicalizedParser parser;
+	//static LexicalizedParser parser;
 	//-dependency
-	static TreebankLanguagePack tlp;
-	static GrammaticalStructureFactory gsf;
+	//static TreebankLanguagePack tlp;
+	//static GrammaticalStructureFactory gsf;
 	
 	//options
 	static boolean ner_select = false;
@@ -54,6 +55,7 @@ public class Tools {
 			System.err.println("³õÊ¼»¯Ê§°Ü£¡fail reason is "+nativeBytes);
 			return false;
 		}
+		/*
 		//1.5
 		tagger = new MaxentTagger(pos_path);
 		//2. ner
@@ -70,6 +72,7 @@ public class Tools {
 			tlp = new ChineseTreebankLanguagePack();
 			gsf = tlp.grammaticalStructureFactory();
 		}
+		*/
 		return true;
 	}
 	public static boolean init(){
@@ -77,9 +80,11 @@ public class Tools {
 	}
 	public static void deinit(){
 		CLibrary.Instance.NLPIR_Exit();
+		/*
 		tagger = null;
 		ner_classifier = null;
 		parser = null;
+		*/
 	}
 	
 	//1.seg & pos
@@ -119,7 +124,7 @@ public class Tools {
 		for(String word : split){
 			String[] one = word.split("/");
 			results.add(one[0]);
-			if(one.length > 1)	//what ??
+			if(one.length > 1 && one[1].length()>0)	//what ??
 				resultp.add(one[1]);
 			else
 				resultp.add(NO_POS);
@@ -134,6 +139,7 @@ public class Tools {
 		return ret;
 	}
 	
+	/*
 	//1.5 pos tagger
 	public static List<String> get_pos(List<String> str){
 		ArrayList<String> tags = new ArrayList<String>();
@@ -178,7 +184,7 @@ public class Tools {
 	    Object[] ret = new Object[]{t,tdl};
 	    return ret;
 	}
-	
+	*/
 	//testing
 	public static void main(String[] x){
 		init(false,false);
@@ -186,16 +192,6 @@ public class Tools {
 		Object[] sseg = get_seg(sample,null);
 		System.out.println((List<String>)sseg[0]);
 		System.out.println((List<String>)sseg[1]);
-		List<String> stag = get_pos((ArrayList<String>)sseg[0]);
-		System.out.println(stag);
-		List<String> sner = get_ner((String)sseg[2]);
-		System.out.println(sner);
-		Object[] sparse = get_parse((ArrayList<String>)sseg[0]);
-		if(sparse != null){
-			Tree t = (Tree)(sparse[0]);
-			t.pennPrint();
-			System.out.println((Collection<TypedDependency>)sparse[1]);
-		}
 		deinit();
 	}
 }
