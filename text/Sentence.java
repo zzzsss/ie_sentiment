@@ -2,9 +2,6 @@ package text;
 
 import java.util.*;
 
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TypedDependency;
-
 public class Sentence implements java.io.Serializable{
 	//1.nlpir
 	public List<String> words;

@@ -55,6 +55,13 @@ public class SentimentFeature_try extends FeatureCounter{
 					add_one_str_feature(str2,d,feats);
 				}
 				
+				/*
+				//skip
+				if(i < s.words.size()-2){
+					String str2 = str+"[]"+s.words.get(i+2);
+					add_one_str_feature(str2,d,feats);
+				}
+				*/
 				
 				//several phrase combinations
 				/*

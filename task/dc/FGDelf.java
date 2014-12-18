@@ -1,17 +1,34 @@
 package task.dc;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import text.Dict;
+import text.Paragraph;
 import training.DataPoint;
 
 public class FGDelf extends DCFeatureGenerator  {
 	double[] for_dict;
-	public FGDelf(FeatureCounter g){
+	String score_file;
+	public FGDelf(FeatureCounter g,String s){
 		super(g);
+		score_file = s;
+		try{
+			FileInputStream if_st = new FileInputStream(score_file);
+			ObjectInputStream ioos = new ObjectInputStream(if_st);
+			double[] ret = (double[])ioos.readObject();
+			ioos.close();
+			for_dict = ret;
+		}
+		catch (Exception e){
+			System.err.println("No score file.");
+		}
 	}
 	//delta if-idf
 	protected Object[] toData(List<HashMap<Integer,Integer>>[] l,Dict d,boolean training){
@@ -34,6 +51,17 @@ public class FGDelf extends DCFeatureGenerator  {
 				logs[i] = Math.log((P*(counts[i][0]+1))/(N*(counts[i][1]+1)));	//add-1 smooth
 			}
 			for_dict = logs;
+			
+			//write score
+			try{
+				FileOutputStream fos = new FileOutputStream(score_file);
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				oos.writeObject(for_dict);
+				oos.close();
+			}
+			catch (Exception e){
+	            e.printStackTrace();
+			}
 		}
 			
 	 		//multiply the idf

@@ -139,14 +139,17 @@ public class DCClassifyTask {
 		}
 		System.out.println("-Final average accuracy is "+all_acc/FOLDS);
 	}
-	public void test_all(String data_loc,String name){
+	public List<Double> [] test_all(String data_loc,String name){
 		System.out.println("Testing all data of "+data_loc);
 		List<Paragraph>[] input_data = reader.read_corpus(data_loc);
 		//double acc = self_test_accuracy(input_data,self_test_onepiece(input_data));
 		//System.out.println("The accuracy is "+acc);
 		List<Double> [] res = self_test_onepiece(input_data);
-		self_test_evaluation_all(res,true);
-		System.out.println("The accuracy is "+self_test_accuracy(input_data,res));
+		if(res.length >= 2){	// no right answer
+			self_test_evaluation_all(res,true);
+			System.out.println("The accuracy is "+self_test_accuracy(input_data,res));
+		}
+		return res;
 	}
 	//special one
 	public double test_one(String str){

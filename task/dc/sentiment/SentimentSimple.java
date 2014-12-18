@@ -56,7 +56,7 @@ public class SentimentSimple {
 	
 	public static void main(String[] s){
 		DictSentiment d = DictSentiment.dict_sentiment;
-		List<Paragraph>[] data = (new SentimentReader2()).read_corpus("data/t_correct/data2_origin.obj");
+		List<Paragraph>[] data = (new SentimentReader2()).read_corpus("data/t_correct/data.obj");
 		check_dict(data,d);
 	}
 }
