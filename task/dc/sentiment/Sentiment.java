@@ -107,14 +107,21 @@ public class Sentiment {
 		f = new FGDelf(new SentimentFeature4(),"testing2/tf.score");
 		r = new DCCorpusReader_test("review");
 		init_task("testing2/f4_tf.mach","testing2/f4_tf.fdict");
-		
 		List<Double> [] result = task.test_all(filename,"WHAT");
 		(new Evaluator("review","label")).eval(filename,result[0]);
 	}
 
+	static void finalfinal_test(String filename,String output_name){
+		r = new FinalTesting.DCCorpusReader_test();
+		f = new FGDelf(new SentimentFeature4(),"testing2/tf.score");
+		init_task("testing2/f4_tf.mach","testing2/f4_tf.fdict");
+		List<Double> [] result = task.test_all(filename,"WHAT");
+		FinalTesting.eval(filename, result[0], output_name);
+	}
 	public static void main(String[] x) throws Exception{
-		final_demo();
+		//final_demo();
 		//final_test("data/test/test.label.cn.txt","WHAT");
 		//final_train();
+		finalfinal_test("data/test/task2input.xml","testing2/test.out");
 	}
 }
